@@ -50,9 +50,10 @@ function currentWeather(city) {
       var todayCard = $("<div>").attr("class", "card");
       $("#today").append(todayCard);
       var cardHeader = $("<h5>").attr("class", "card-header").text(response.name + " " + todaysDate);
-      var weatherImg = $("<img>").attr("src", weatherIcon);
+      var weatherImg = $("<img>").attr("src", weatherIcon)
+      var weatherImgText = $("<p>").text(`Today's weather will be: ${response.weather[0].description}.`);
       todayCard.append(cardHeader);
-      cardHeader.append(weatherImg);
+      cardHeader.append(weatherImg, weatherImgText);
 
       var cardBody = $("<div>").attr({ class: "card-body" , id: "uv-value"});
       // this id helps to ad UV info to main card body once its ajax call is made later on ( ref. line 118)
@@ -95,11 +96,11 @@ function currentUV(coord) {
 
       var todaysUV = response.value;
 
-      var uvText = $("<span>")
+      var uvText = $("<p>").attr("card-text")
         .css({
           "border": "1px, solid, black",
           "color": "white"
-        }).text("Today's UV index is: " + todaysUV);
+        }).html("Today's UV index is: " + todaysUV);
        
 
       if (uvText < 3) {

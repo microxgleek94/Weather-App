@@ -1,0 +1,1 @@
+This website was made using Bootstrap as a CSS framework; HTML, Javascript, and OpenWeatherMap's API (https://openweathermap.org/) to to dynamically create a weather web-based application. The user can search any city in the search field, and the city's current weather, including temperature, UV Index, Humidity and the current date will show. Addtionally the 

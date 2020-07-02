@@ -1,5 +1,6 @@
 var apiKey = "&appid=a400997ac621db3b31a40eafd7fd1b25";
 
+// localStorage has 2 parameters a key and a value
 
 // when the use clicks on the "Search" btn, this function will run
 $("#search-button").click(function () {
@@ -14,7 +15,30 @@ $("#search-button").click(function () {
 
   // function for five day forecast
   fiveDayForecast(city);
+
+  //function to save to localStorage
+  // if there is no previous searched cities, the keyword "cityhistory" will be created 
+  // and store the value of "city" into an array
+  if (!localStorage.cityhistory) {
+    localStorage.setItem("cityhistory", JSON.stringify([city]))
+  }
+  else {
+    var pastCities = JSON.parse(localStorage.cityhistory);
+    pastCities.push(city);
+    console.log(pastCities); // this is the array of the past cities the user has searched on their machine
+    localStorage.setItem("cityhistory", JSON.stringify(pastCities));
+  }
+  // Function for local storage
+  function getPastCities() {
+    var cityhistory = pastCities;
+    for (var i = 0; i < cityhistory.length; i++) {
+      var cityList = $("<button>").attr({ type: "button", class: "list-group-item list-group-item-action" }).text(cityhistory[i]);
+      $("#history").append(cityList);
+    }
+  };
+  getPastCities();
 });
+
 
 
 
@@ -108,7 +132,7 @@ function currentUV(coord) {
 
       // appending UV Index to Current Weather container
       var uvContainer = $("#uv-background").css({ "color": "white" }).text(todaysUV);
-      var uvText = $("#uv-text").attr({ "class": "card-text" }).html("Today's UV index is: ");
+      var uvText = $("#uv-text").attr("class", "card-text").html("Today's UV index is: ");
 
       $("#uv-value").append(uvText, uvContainer);
       uvText.append(uvContainer);
@@ -136,7 +160,7 @@ function currentUV(coord) {
 //Function to create five day forecast cards
 function fiveDayForecast(city) {
 
-  var fiveDayURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city +  apiKey;
+  var fiveDayURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + apiKey;
 
   // testing 5 Day Forecast object
   // https://api.openweathermap.org/data/2.5/forecast?q=copiague&appid=a400997ac621db3b31a40eafd7fd1b25
@@ -145,7 +169,7 @@ function fiveDayForecast(city) {
     url: fiveDayURL,
     method: "GET",
   })
-    .then(function (response){
+    .then(function (response) {
 
       // log the fiveDayURL
       console.log(`This is the fivedayURL: ${fiveDayURL}`);
@@ -166,7 +190,7 @@ function fiveDayForecast(city) {
       // **Note** Because the 5 Day forcasts pulls weather data every 3 hrs for 5 days, 
       // there are 24/3 = 8 sets of weather data per day // 8*5 = 40 returning objects for the 5 day call
       // this for loop will iterate through the object 8x and pull the data so that way 5 weather cards are created
-      for (var i = 0; i < forecastInfo.length; i += 8){
+      for (var i = 0; i < forecastInfo.length; i += 8) {
 
         // console.log(forecastInfo[i].weather[0].description);
 
@@ -181,9 +205,9 @@ function fiveDayForecast(city) {
         var innerCard = $("<div>").attr({ class: "card", id: "five-day-card" });
         var innerCardBody = $("<div>").attr("class", "card-body");
         var fiveDateDisplay = $("<h4>").attr("class", "card-title").text(fiveDayDate.toDateString()); // creates a new date for each card 5 days in the future
-        var fiveImageDisplay = $("<img>").attr("src", fiveImg);
-        var fiveTempDisplay = $("<p>").attr("class", "card-text").text("Temp: " + fiveTemp + "&deg;F");
-        var fiveHumidityDisplay = $("<p>").attr("class", "card-text").text("Humidity: " + fiveHumidity + "&#37;");
+        var fiveImageDisplay = fiveImg;
+        var fiveTempDisplay = $("<p>").attr("class", "card-text").html("Temp: " + fiveTemp + "&deg;F");
+        var fiveHumidityDisplay = $("<p>").attr("class", "card-text").html("Humidity: " + fiveHumidity + "&#37;");
         innerCardBody.append(fiveDateDisplay, fiveImageDisplay, fiveImgText, fiveTempDisplay, fiveHumidityDisplay);
         innerCard.append(innerCardBody);
         fiveDayContainer.append(innerCard);
@@ -201,5 +225,5 @@ function fiveDayForecast(city) {
 
       //** Still Need to Do **/
 
-      // Function for local storage
+
 

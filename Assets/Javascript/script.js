@@ -1,45 +1,36 @@
 var apiKey = "&appid=a400997ac621db3b31a40eafd7fd1b25";
 
-// localStorage has 2 parameters a key and a value
-
 // when the use clicks on the "Search" btn, this function will run
 $("#search-button").click(function () {
+
+  //to empty the weather containers
+  $('#today').empty();
+  $('#forecast').empty();
 
   // the value of the city input the user will submit
   var city = $("#search-value").val();
   console.log("Submit btn was clicked");
   console.log(`The user's city input is: ${city}`);
 
+  //Clear input box
+  $("#search-value").val('');
+
+  //to create the past history display
+  var cityList = $("<button>")
+    .attr({
+      type: "button",
+      class: "list-group-item list-group-item-action",
+      id: "historysearch"
+    })
+  var historyText = cityList.text(city);
+  $("#history").prepend(historyText);
+
   // Calls the function to get current weather
   currentWeather(city);
 
-  // function for five day forecast
+  // Calls function for five day forecast
   fiveDayForecast(city);
-
-  //function to save to localStorage
-  // if there is no previous searched cities, the keyword "cityhistory" will be created 
-  // and store the value of "city" into an array
-  if (!localStorage.cityhistory) {
-    localStorage.setItem("cityhistory", JSON.stringify([city]))
-  }
-  else {
-    var pastCities = JSON.parse(localStorage.cityhistory);
-    pastCities.push(city);
-    console.log(pastCities); // this is the array of the past cities the user has searched on their machine
-    localStorage.setItem("cityhistory", JSON.stringify(pastCities));
-  }
-  // Function for local storage
-  function getPastCities() {
-    var cityhistory = pastCities;
-    for (var i = 0; i < cityhistory.length; i++) {
-      var cityList = $("<button>").attr({ type: "button", class: "list-group-item list-group-item-action" }).text(cityhistory[i]);
-      $("#history").append(cityList);
-    }
-  };
-  getPastCities();
 });
-
-
 
 
 //  Current Weather 
@@ -56,6 +47,14 @@ function currentWeather(city) {
   })
     .then(function (response) {
 
+      // this will push the city that is searched information to the empty array for local storage
+      if (pastHistory.indexOf(city) === -1) {
+        pastHistory.push(city);
+        window.localStorage.setItem("cityhistory", JSON.stringify(pastHistory));
+
+      }
+
+
       // Log the todayURL
       console.log(`This is the todayURL: ${todayURL}`);
 
@@ -63,27 +62,27 @@ function currentWeather(city) {
 
       // Log the resulting object
       // console.log(`This is the current weather object: ${response}`) - this returns [object, Object]
-      console.log(`This is the current weather object: ${JSON.stringify(currentWeatherInfo)}`); // returns the object as a string
+      // console.log(`This is the current weather object: ${JSON.stringify(currentWeatherInfo)}`); // returns the object as a string
       // won't console log the object when using ${JSON.parse(JSON.stringify(response))}
 
 
       // API Data
-      var temp = Math.round((response.main.temp - 273.15) * 1.80 + 32); // to covert temp. into F as a whole number
+      var temp = Math.round((currentWeatherInfo.main.temp - 273.15) * 1.80 + 32); // to covert temp. into F as a whole number
       // console.log(`Temp is:${temp}`);
-      var humidity = response.main.humidity;
+      var humidity = currentWeatherInfo.main.humidity;
       // console.log(`Humidity is:${humidity}`);
-      var wind = response.wind.speed;
+      var wind = currentWeatherInfo.wind.speed;
       // console.log(`Wind is:${wind}`);
-      var weatherIcon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
-      var coord = "?lat=" + response.coord.lat + "&lon=" + response.coord.lon; // coord. var to use later for 5 day forecast
+      var weatherIcon = "https://openweathermap.org/img/w/" + currentWeatherInfo.weather[0].icon + ".png";
+      var coord = "?lat=" + currentWeatherInfo.coord.lat + "&lon=" + currentWeatherInfo.coord.lon; // coord. var to use later for 5 day forecast
 
 
       //Create and append today's weather card
       var todayCard = $("<div>").attr("class", "card");
       $("#today").append(todayCard);
-      var cardHeader = $("<h5>").attr("class", "card-header").text(response.name + " " + todaysDate);
+      var cardHeader = $("<h5>").attr("class", "card-header").text(currentWeatherInfo.name + " " + todaysDate);
       var weatherImg = $("<img>").attr("src", weatherIcon)
-      var weatherImgText = $("<p>").text(`Today's weather will be: ${response.weather[0].description}.`);
+      var weatherImgText = $("<p>").text(`Today's weather will be: ${currentWeatherInfo.weather[0].description}.`);
       todayCard.append(cardHeader);
       cardHeader.append(weatherImg, weatherImgText);
 
@@ -104,6 +103,38 @@ function currentWeather(city) {
     });
   // end of current weather function
 };
+
+
+// Function to search for clicked items in history list
+$('#historysearch').click(function () {
+  // event.preventDefault();
+  $('#today').empty();
+  $('#forecast').empty();
+  console.log(`A previous city was clicked`);
+  var newSearchCity = $(this).text();
+  console.log(`The new search city's weather is: ${newSearchCity}`);
+  currentWeather(newSearchCity);
+});
+
+
+// Code to retrieve local storage information
+var pastHistory = JSON.parse(localStorage.getItem("cityhistory")) || [];
+console.log(`this is the local storage of past cities searched: ${pastHistory}`);
+
+if (pastHistory.length > 0) {
+  currentWeather(pastHistory[pastHistory.length - 1]);
+}
+
+for (var i = 0; i < pastHistory.length; i++) {
+  var cityList = $("<button>")
+    .attr({
+      type: "button",
+      class: "list-group-item list-group-item-action",
+      id: "historysearch"
+    })
+  var historyText = cityList.text(pastHistory[i]);
+  $("#history").prepend(historyText);
+}
 
 
 
@@ -154,7 +185,6 @@ function currentUV(coord) {
     })
   // end of currentUV function
 };
-
 
 
 //Function to create five day forecast cards
@@ -212,18 +242,15 @@ function fiveDayForecast(city) {
         innerCard.append(innerCardBody);
         fiveDayContainer.append(innerCard);
 
-        console.log(fiveDateDisplay);
-        console.log(fiveImg);
-        console.log(fiveHumidity + "&#37;");
-        console.log(fiveTemp + "&deg;F");
+        // console.log(fiveDateDisplay);
+        // console.log(fiveImg);
+        // console.log(fiveHumidity + "&#37;");
+        // console.log(fiveTemp + "&deg;F");
       }
       //end of ajax call for five day forecast
     })
   //end of fiveDayForecast function         
-}
-
-
-      //** Still Need to Do **/
+};
 
 
 

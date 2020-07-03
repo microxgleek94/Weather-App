@@ -1,10 +1,9 @@
 var apiKey = "&appid=a400997ac621db3b31a40eafd7fd1b25";
 
 // // to clear local storage when browser is refreshed
-// window.onbeforeunload = function (e) {
-//   $('#today').empty();
-//   $('#forecast').empty();
-// };
+window.onbeforeunload = function (e) {
+  localStorage.clear();
+};
 
 $('#today').empty();
 $('#forecast').empty();
@@ -56,7 +55,7 @@ function currentWeather(city) {
   })
     .then(function (response) {
 
-      // this will push the city that is searched information to the empty array for local storage
+      // this will push the city that is searched's information to the empty array for local storage
       if (pastHistory.indexOf(city) === -1) {
         pastHistory.push(city);
         window.localStorage.setItem("cityhistory", JSON.stringify(pastHistory));
@@ -83,12 +82,13 @@ function currentWeather(city) {
       // console.log(`Wind is:${wind}`);
       var weatherIcon = "https://openweathermap.org/img/w/" + currentWeatherInfo.weather[0].icon + ".png";
       var coord = "?lat=" + currentWeatherInfo.coord.lat + "&lon=" + currentWeatherInfo.coord.lon; // coord. var to use later for 5 day forecast
-
+      var country = currentWeatherInfo.sys.country;
+      console.log(`The country for this city is ${country}`);
 
       //Create and append today's weather card
       var todayCard = $("<div>").attr("class", "card");
       $("#today").append(todayCard);
-      var cardHeader = $("<h5>").attr("class", "card-header").text(currentWeatherInfo.name + " " + todaysDate);
+      var cardHeader = $("<h5>").attr("class", "card-header").html(currentWeatherInfo.name + ", " + country + "<br>" + todaysDate);
       var weatherImg = $("<img>").attr("src", weatherIcon)
       var weatherImgText = $("<p>").text(`Today's weather will be: ${currentWeatherInfo.weather[0].description}.`);
       todayCard.append(cardHeader);
@@ -229,6 +229,8 @@ function fiveDayForecast(city) {
 };
 
 // Function to search for clicked items in history list
+// **Note** You had to first target the container that holds the buttons (.history)
+// and then on the ".on("click") you had to add the id's for the buttons so the click event would register
 $("#history").on("click", "#historysearch", function () {
   // event.preventDefault();
   $("#today").empty();

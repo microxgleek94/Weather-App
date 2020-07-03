@@ -1,9 +1,18 @@
 var apiKey = "&appid=a400997ac621db3b31a40eafd7fd1b25";
 
+// // to clear local storage when browser is refreshed
+// window.onbeforeunload = function (e) {
+//   $('#today').empty();
+//   $('#forecast').empty();
+// };
+
+$('#today').empty();
+$('#forecast').empty();
+
 // when the use clicks on the "Search" btn, this function will run
 $("#search-button").click(function () {
-
-  //to empty the weather containers
+  event.preventDefault();
+  //to empty the weather containers when the search button is clicked
   $('#today').empty();
   $('#forecast').empty();
 
@@ -12,7 +21,7 @@ $("#search-button").click(function () {
   console.log("Submit btn was clicked");
   console.log(`The user's city input is: ${city}`);
 
-  //Clear input box
+  // //Clear input box
   $("#search-value").val('');
 
   //to create the past history display
@@ -51,7 +60,6 @@ function currentWeather(city) {
       if (pastHistory.indexOf(city) === -1) {
         pastHistory.push(city);
         window.localStorage.setItem("cityhistory", JSON.stringify(pastHistory));
-
       }
 
 
@@ -104,40 +112,6 @@ function currentWeather(city) {
   // end of current weather function
 };
 
-
-// Function to search for clicked items in history list
-$('#historysearch').click(function () {
-  // event.preventDefault();
-  $('#today').empty();
-  $('#forecast').empty();
-  console.log(`A previous city was clicked`);
-  var newSearchCity = $(this).text();
-  console.log(`The new search city's weather is: ${newSearchCity}`);
-  currentWeather(newSearchCity);
-});
-
-
-// Code to retrieve local storage information
-var pastHistory = JSON.parse(localStorage.getItem("cityhistory")) || [];
-console.log(`this is the local storage of past cities searched: ${pastHistory}`);
-
-if (pastHistory.length > 0) {
-  currentWeather(pastHistory[pastHistory.length - 1]);
-}
-
-for (var i = 0; i < pastHistory.length; i++) {
-  var cityList = $("<button>")
-    .attr({
-      type: "button",
-      class: "list-group-item list-group-item-action",
-      id: "historysearch"
-    })
-  var historyText = cityList.text(pastHistory[i]);
-  $("#history").prepend(historyText);
-}
-
-
-
 // Function to get Today's UV Index
 // The current UV index is collected at the same time as the current weather
 //  by making use of the searched city's returned coordinates
@@ -162,25 +136,30 @@ function currentUV(coord) {
       // won't console log the object when using ${JSON.parse(JSON.stringify(response))}
 
       // appending UV Index to Current Weather container
-      var uvContainer = $("#uv-background").css({ "color": "white" }).text(todaysUV);
-      var uvText = $("#uv-text").attr("class", "card-text").html("Today's UV index is: ");
+      var uvContainer = $("<span>").text(todaysUV).attr("id", "uv-background").css("color", "white");
+      var uvText = $("<p>")
+        .attr({
+          class: "card-text",
+          id: "uv-text",
+          value: todaysUV,
+        })
+        .html("Today's UV index is: ");
 
       $("#uv-value").append(uvText, uvContainer);
       uvText.append(uvContainer);
 
 
-      if (uvText < 3) {
-        uvContainer.css("background-color", "green");
-      } else if (uvText < 6) {
-        uvContainer.css("background-color", "yellow");
-      } else if (uvText = 6 || 7) {
+      if (todaysUV < 3) {
+         uvContainer.css("background-color", "green");
+      } else if ( todaysUV < 7) {
+         uvContainer.css("background-color", "#dcc83b");
+      } else if (todaysUV < 8) {
         uvContainer.css("background-color", "orange");
-      } else if (uvText >= 8 || 10) {
-        uvContainer.css("background-color", "red");
+      } else if (todaysUV < 10) {
+         uvContainer.css("background-color", "red");
       } else {
-        ("background-color", "violet");
+        uvContainer.css("background-color", "purple");
       }
-
       // end of uvIndex ajax response 
     })
   // end of currentUV function
@@ -207,9 +186,6 @@ function fiveDayForecast(city) {
       var forecastInfo = response.list;
       // logging the resulting object for the five day forcast
       // console.log(`This is the five day weather forecast:${forecastInfo}`);
-
-      // to make sure forecast div is empty when page refreshes
-      $("#forecast").empty();
 
       // the container to hold the five day cards
       var fiveDayContainer = $("<div>").attr("class", "card-group"); //row row-cols-1 row-cols-md-5
@@ -252,5 +228,37 @@ function fiveDayForecast(city) {
   //end of fiveDayForecast function         
 };
 
+// Function to search for clicked items in history list
+$('#historysearch').click(function () {
+  // event.preventDefault();
+  $('#today').empty();
+  $('#forecast').empty();
+  console.log(`A previous city was clicked`);
 
+  var newSearchCity = $(this).text();
+  console.log(`The new search city's weather is: ${newSearchCity}`);
+
+  currentWeather(newSearchCity);
+  fiveDayForecast(newSearchCity);
+});
+
+
+// Code to retrieve local storage information
+var pastHistory = JSON.parse(localStorage.getItem("cityhistory")) || [];
+
+if (pastHistory.length > 0) {
+  currentWeather(pastHistory[pastHistory.length - 1]);
+}
+
+for (var i = 0; i < pastHistory.length; i++) {
+  var cityList = $("<button>")
+    .attr({
+      type: "button",
+      class: "list-group-item list-group-item-action",
+      id: "historysearch"
+    })
+  var historyText = cityList.text(pastHistory[i]);
+  $("#history").prepend(historyText);
+  console.log(`this is the local storage of past cities searched: ${pastHistory}`);
+}
 

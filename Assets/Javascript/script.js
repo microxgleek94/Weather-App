@@ -229,11 +229,11 @@ function fiveDayForecast(city) {
 };
 
 // Function to search for clicked items in history list
-$('#historysearch').click(function () {
+$("#history").on("click", "#historysearch", function () {
   // event.preventDefault();
-  $('#today').empty();
-  $('#forecast').empty();
-  console.log(`A previous city was clicked`);
+  $("#today").empty();
+  $("#forecast").empty();
+  console.log("A previous city was clicked");
 
   var newSearchCity = $(this).text();
   console.log(`The new search city's weather is: ${newSearchCity}`);

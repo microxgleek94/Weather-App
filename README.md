@@ -14,3 +14,16 @@ https://microxgleek94.github.io/Weather-App/
 ![Weather App Desktop View](Assets/Screenshots/WeatherApp-DesktopView.png) 
 ![Weather App Mobile View](Assets/Screenshots/WeatherApp-MobileView.png)
 
+# Contact
+  
+![Badge](https://img.shields.io/badge/Github-microxgleek94-green) 
+  
+![Profile Image](https://github.com/microxgleek94.png?size=200)
+  
+**Contact email:** kiki_hanson@aol.com
+  
+**GitHub Username:**  https://github.com/microxgleek94
+  
+**Best form of contact:** Email
+  
+**GitHub Project link:** hhttps://github.com/microxgleek94/Weather-App

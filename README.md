@@ -26,4 +26,4 @@ https://microxgleek94.github.io/Weather-App/
   
 **Best form of contact:** Email
   
-**GitHub Project link:** hhttps://github.com/microxgleek94/Weather-App
+**GitHub Project link:** https://github.com/microxgleek94/Weather-App
